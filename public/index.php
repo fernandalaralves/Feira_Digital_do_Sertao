@@ -146,6 +146,7 @@ function h(?string $s): string
         <label>Quantidade: <input type="number" name="quantidade" step="0.01" min="0.01" value="1"></label>
         <button type="submit">Adicionar ao pedido</button>
     </form>
+    
     <h3>Pedidos salvos (persistência JSON)</h3>
     <?php $salvos = carregarPedidos(); ?>
     <?php if (empty($salvos)): ?>
