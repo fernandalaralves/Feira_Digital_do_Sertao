@@ -9,6 +9,7 @@ Legenda: `<|--` herança ("é um"), `*--` composição ("tem um"), `#` protected
 classDiagram
     Produto <|-- ProdutoUnitario
     Produto <|-- ProdutoPorPeso
+    Produto <|-- ProdutoPerecivel
     Pedido "1" *-- "*" ItemPedido
     ItemPedido --> Produto
 
@@ -17,6 +18,8 @@ classDiagram
         #float preco
         +__construct(string nome, float preco)
         +getNome() string
+        +setNome(string nome) void
+        +setPreco(float preco) void
         +calcularPreco(float quantidade) float
         +paraArray() array
     }
@@ -24,19 +27,33 @@ classDiagram
         +calcularPreco(float quantidade) float
     }
     class ProdutoPorPeso {
-        -float pesoMinimo
+        -float pesoMaximo
+        +__construct(string nome, float preco, float pesoMaximo)
         +calcularPreco(float quantidade) float
+        +paraArray() array
+    }
+    class ProdutoPerecivel {
+        -DateTime validade
+        +__construct(string nome, float preco, DateTime validade)
+        +estaVencido() bool
+        +calcularPreco(float quantidade) float
+        +paraArray() array
     }
     class ItemPedido {
         -Produto produto
         -float quantidade
-        +calcularSubtotal() float
+        +__construct(Produto produto, float quantidade)
+        +getProduto() Produto
+        +getQuantidade() float
+        +getSubtotal() float
     }
     class Pedido {
-        -string cliente
         -array itens
         +adicionarItem(ItemPedido item) void
+        +getItens() array
         +calcularTotal() float
+        +finalizar() void
+        +paraArray() array
     }
 ```
 
@@ -44,12 +61,30 @@ classDiagram
 
 ### Herança
 
-_(Qual é a classe mãe, quais são as filhas e por que a frase "X é um Y" vale para cada uma. Qual método é sobrescrito e por quê.)_
+A classe mãe é a Produto, que concentra o nome e o preço (atributos protected) e o método calcularPreco(). As classes filhas são:
+
+ProdutoUnitario (é um Produto vendido por unidade).
+
+ProdutoPorPeso (é um Produto vendido por quilo).
+
+ProdutoPerecivel (é um Produto que tem data de validade).
+
+A frase "X é um Y" vale para todas, pois cada filha é um tipo específico de produto da feira.
+
+O método sobrescrito é o calcularPreco(float $quantidade).
+
+Em ProdutoPorPeso, ele é sobrescrito para validar se a quantidade (peso) não ultrapassa o pesoMaximo.
+
+Em ProdutoPerecivel, ele é sobrescrito para aplicar 20% de desconto automático caso a validade esteja a 3 dias ou menos do vencimento, usando a função DateTime::diff().
 
 ### Composição
 
-_(Qual classe guarda uma lista de objetos de outra e por que a relação é "tem um", e não "é um".)_
+A classe Pedido guarda uma lista de objetos ItemPedido. A relação é "tem um" (um Pedido tem vários Itens), e não "é um" (um Pedido não é um Item). Além disso, o Pedido é o responsável por gerenciar essa lista, adicionando itens com adicionarItem() e calculando o total com calcularTotal().
 
 ### Encapsulamento
 
-_(Quais atributos têm getter, quais têm setter e por que alguns não têm setter.)_
+Nenhum atributo é público (todos são private ou protected).
+
+Onde tem setter: apenas em Produto, para nome e preco (pois o feirante pode precisar alterar o nome ou o preço). Esses setters têm validação (recusam nome vazio e preço menor ou igual a zero).
+
+Onde NÃO tem setter: em ProdutoPorPeso (pesoMaximo), ProdutoPerecivel (validade), ItemPedido (produto e quantidade) e Pedido (itens). Esses dados são definidos no construtor e não devem ser alterados depois de criados. Para acessá-los, existem apenas getters (ex: getItens()).

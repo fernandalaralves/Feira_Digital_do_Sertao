@@ -1,4 +1,4 @@
-# NOME DO SISTEMA
+# FEIRA DIGITAL DO SERTÃO
 
 > Trabalho individual de Programação Web I (IFCE Campus Boa Viagem): sistema web orientado a objetos em PHP.
 
